@@ -1,0 +1,83 @@
+--- global configs ---
+prosody_user = "_prosody"
+prosody_group = "_prosody"
+daemonize = true
+pidfile = "/var/prosody/prosody.pid"
+
+admins = { "{{ username }}@{{ domain }}" }
+
+plugin_paths = { "/usr/local/lib/prosody/community-modules" }
+
+log = {
+  info = "*syslog";
+}
+
+modules_enabled = {
+  -- core modules --
+  "roster";
+  "saslauth";
+  "tls";
+  "dialback";
+  "disco";
+  "carbons";
+  "pep";
+  "private";
+  "blocklist";
+  "vcard";
+  "version";
+  "uptime";
+  "time";
+  "ping";
+  "mam";
+  "admin_adhoc";
+  "proxy65";
+  "http";
+
+  -- community modules --
+  "smacks";
+  "smacks_noerror";
+  "csi";
+  "csi_battery_saver";
+  "http_upload";
+  "omemo_all_access";
+  "cloud_notify";
+  "idlecompat";
+  "pep_vcard_avatar";
+  "delay";
+}
+
+allow_registration = false
+
+authentication = "dovecot"
+dovecot_auth_socket = "/var/prosody/dovecot-auth"
+
+c2s_require_encryption = true
+s2s_require_encryption = true
+s2s_secure_auth = true
+
+certificates = "certs"
+https_certificate = "/etc/prosody/certs/{{ domain }}.crt"
+
+storage = "sql"
+sql = { driver = "PostgreSQL", database = "prosody", username = "_prosody" }
+
+-- module configs ---
+http_ports = { }
+http_interfaces = { }
+https_ports = { 5280 }
+http_external_url = "https://xmpp.{{ domain }}:5280/"
+https_external_url = "https://xmpp.{{ domain }}:5280/"
+proxy65_ports = { {{ prosody_proxy_port }} }
+http_upload_file_size_limit = {{ prosody_upload_maxsize }}
+http_upload_expire_after = {{ prosody_upload_expiration }}
+http_upload_quota = {{ prosody_upload_quota }}
+push_notification_with_body = {{ 'false' if prosody_push_anonymous else 'true' }}
+push_notification_with_sender = {{ 'false' if prosody_push_anonymous else 'true' }}
+
+-- virtual hosts ---
+VirtualHost "{{ domain }}"
+  http_host = "xmpp.{{ domain }}"
+Component "conference.{{ domain }}" "muc"
+  modules_enabled = { "mam_muc" }
+Component "proxy.{{ domain }}" "proxy65"
+Component "xmpp.{{ domain }}" "http_upload"

@@ -1,0 +1,68 @@
+---
+- name: install packages
+  openbsd_pkg:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - prosody
+    - luadbi-pgsql
+    - mercurial
+
+- name: remove localhost certificates
+  file:
+    path: /etc/prosody/certs/{{ item }}
+    state: absent
+  with_items:
+    - localhost.crt
+    - localhost.key
+
+- name: create postgres user
+  postgresql_user:
+    name: _prosody
+  become_user: _postgresql
+
+- name: create postgres db
+  postgresql_db:
+    name: prosody
+    owner: _prosody
+  become_user: _postgresql
+
+- name: get community modules
+  hg:
+    repo: https://hg.prosody.im/prosody-modules/
+    dest: /usr/local/lib/prosody/community-modules
+  notify: restart prosody
+
+- name: generate configuration
+  template:
+    src: prosody.cfg.lua.j2
+    dest: /etc/prosody/prosody.cfg.lua
+  notify: reload prosody
+
+- name: import ssl certificates
+  shell: >
+    cp /etc/ssl/{{ domain }}.fullchain.pem /etc/prosody/certs/{{ domain }}.crt &&
+    cp /etc/ssl/private/{{ domain }}.key /etc/prosody/certs/{{ domain }}.key &&
+    chown root:_prosody /etc/prosody/certs/* &&
+    chmod 640 /etc/prosody/certs/*
+  args:
+    creates: /etc/prosody/certs/{{ domain }}.key
+
+- name: enable and start daemon
+  service:
+    name: prosody
+    enabled: yes
+    state: started
+
+- name: add letsencrypt renewal hook
+  copy:
+    content: |
+      #!/bin/sh
+      cp /etc/ssl/{{ domain }}.fullchain.pem /etc/prosody/certs/{{ domain }}.crt
+      cp /etc/ssl/private/{{ domain }}.key /etc/prosody/certs/{{ domain }}.key
+      chown root:_prosody /etc/prosody/certs/*
+      chmod 640 /etc/prosody/certs/*
+      doas -u _prosody /usr/local/sbin/prosodyctl reload
+    dest: /etc/acme/hooks.d/prosody.sh
+    mode: 0555
+

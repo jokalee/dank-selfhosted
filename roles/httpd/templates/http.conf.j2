@@ -1,0 +1,13 @@
+listen on * port 80
+listen on :: port 80
+
+log style combined
+
+location "/.well-known/acme-challenge/*" {
+  root "/acme"
+  root strip 2
+}
+
+location * {
+  block return 301 "https://$HTTP_HOST$REQUEST_URI"
+}

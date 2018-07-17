@@ -1,0 +1,30 @@
+inbound_tcp = "{ http, https, submission, imaps, domain, xmpp-client, xmpp-server, xmpp-bosh, {{ prosody_proxy_port }}, {{ sshd_port }} }"
+inbound_udp = "{ domain }"
+
+{% if open_ports %}
+open_ports = "{ {{ open_ports | join(', ') }} }"
+{% endif %}
+
+table <spamd-white> persist
+table <bigmailers> persist
+table <nospamd> persist file "/etc/mail/whitelist.txt"
+
+set skip on lo
+
+block all
+
+# allow all ICMP
+pass proto icmp
+pass proto icmp6
+
+# smtp/spamd
+pass in on egress inet proto tcp to port smtp divert-to 127.0.0.1 port spamd
+pass in on egress inet proto tcp from { <nospamd>, <spamd-white>, <bigmailers> } to port smtp
+
+{% if open_ports %}
+pass in on egress proto tcp to port $open_ports
+{% endif %}
+pass in on egress proto tcp to port $inbound_tcp
+pass in on egress proto udp to port $inbound_udp
+
+pass out

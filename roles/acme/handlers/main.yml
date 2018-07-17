@@ -1,0 +1,3 @@
+---
+- name: run acme hooks
+  command: /etc/acme/run-hooks.sh

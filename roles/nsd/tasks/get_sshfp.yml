@@ -1,0 +1,11 @@
+# get SSHFP records for hostname and bare domain
+---
+- name: run ssh-keygen for SSHFP records
+  shell: ssh-keygen -r @ && ssh-keygen -r {{ hostname }}
+  changed_when: False
+  register: sshfp_keygen
+
+- name: set SSHFP records
+  set_fact:
+    sshfp_records: '{{ sshfp_keygen.stdout }}'
+

@@ -1,0 +1,112 @@
+- name: set hostname
+  hostname:
+    name: '{{ hostname }}.{{ domain }}'
+
+- name: set timezone
+  timezone:
+    name: '{{ timezone }}'
+
+- name: set default gateway
+  copy:
+    content: "{{ gateway }}\n"
+    dest: /etc/mygate
+
+- name: generate hostname.if
+  template:
+    src: hostname.if.j2
+    dest: /etc/hostname.{{ interface }}
+
+- name: generate resolv.conf
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+
+- name: generate ntpd.conf
+  template:
+    src: ntpd.conf.j2
+    dest: /etc/ntpd.conf
+  notify: restart ntpd
+
+- name: create ssh group
+  group:
+    gid: 22
+    name: ssh
+
+- name: add users to ssh group
+  user:
+    name: '{{ item }}'
+    groups: ssh
+    append: yes
+  with_items: '{{ [username] + (ssh_users | default([])) }}'
+
+- name: add ssh keys
+  authorized_key:
+    user: '{{ username }}'
+    key: '{{ item }}'
+  with_items: '{{ ssh_keys }}'
+
+- name: generate sshd_config
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+  notify: restart sshd
+
+- name: generate /etc/hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+
+- name: copy login.conf
+  copy:
+    src: login.conf
+    dest: /etc/login.conf
+  notify: rebuild login database
+
+- name: generate pf.conf
+  template:
+    src: pf.conf.j2
+    dest: /etc/pf.conf
+  notify: reload pf
+
+- name: set crontab path
+  lineinfile:
+    regexp: ^PATH=
+    line: PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+    path: /var/cron/tabs/root
+
+- name: disable sndiod
+  service:
+    name: sndiod
+    enabled: no
+    state: stopped
+
+- name: touch log files
+  copy:
+    content: ""
+    dest: /var/log/{{ item }}
+    force: no
+    mode: 0640
+  with_items:
+    - nsd
+    - postgresql
+    - prosody
+    - spamd
+    - httpd
+  notify: reload syslog
+
+- name: generate syslog configuration
+  copy:
+    src: syslog.conf
+    dest: /etc/syslog.conf
+  notify: reload syslog
+
+- name: generate newsyslog configuration
+  copy:
+    src: newsyslog.conf
+    dest: /etc/newsyslog.conf
+  notify: newsyslog
+
+- name: set dank MOTD
+  template:
+    src: motd.j2
+    dest: /etc/motd

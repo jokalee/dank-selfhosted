@@ -1,0 +1,33 @@
+---
+- name: install packages
+  openbsd_pkg:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - dovecot
+    - dovecot-pigeonhole
+
+- name: install prosody to ensure socket path exists
+  openbsd_pkg:
+    name: prosody
+    state: present
+
+- name: generate configuration
+  template:
+    src: dovecot.conf.j2
+    dest: /etc/dovecot/dovecot.conf
+  notify: reload dovecot
+
+- name: add acme hook
+  copy:
+    content: |
+      #!/bin/sh
+      rcctl reload dovecot
+    dest: /etc/acme/hooks.d/dovecot.sh
+    mode: 0555
+
+- name: enable and start daemon
+  service:
+    name: dovecot
+    enabled: yes
+    state: started

@@ -1,0 +1,6 @@
+---
+prosody_proxy_port: 5000
+prosody_push_anonymous: True
+prosody_upload_maxsize: 10485760   # 10 MB
+prosody_upload_expiration: 604800  # 1 week
+prosody_upload_quota: 1073741824   # 1 GB

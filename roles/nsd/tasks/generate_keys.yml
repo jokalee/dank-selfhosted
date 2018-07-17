@@ -1,0 +1,27 @@
+# generate DNSSEC keys
+---
+- name: create key directory
+  file:
+    path: /var/nsd/keys
+    owner: root
+    group: _nsd
+    mode: 0750
+    state: directory
+
+- name: generate ZSK
+  shell: ZSK=$(ldns-keygen -a ECDSAP256SHA256 {{ domain }}) && mv ${ZSK}.key {{ domain }}.zsk.key && mv ${ZSK}.private {{ domain }}.zsk.private
+  args:
+    chdir: /var/nsd/keys
+    creates: /var/nsd/keys/{{ domain }}.zsk.private
+
+- name: generate KSK
+  shell: KSK=$(ldns-keygen -k -a ECDSAP256SHA256 {{ domain }}) && mv ${KSK}.key {{ domain }}.ksk.key && mv ${KSK}.private {{ domain }}.ksk.private
+  args:
+    chdir: /var/nsd/keys
+    creates: /var/nsd/keys/{{ domain }}.ksk.private
+
+- name: remove DS files
+  shell: rm -f /var/nsd/keys/*.ds
+  args:
+    warn: False
+  changed_when: False

@@ -1,0 +1,15 @@
+server www.{{ domain }} {
+  alias {{ domain }}
+  include "/etc/httpd.d/http.conf"
+  root "/nonexistent"
+}
+
+server {{ domain }} {
+  include "/etc/httpd.d/https.conf"
+  block return 301 "https://www.{{ domain }}$REQUEST_URI"
+}
+
+server www.{{ domain }} {
+  include "/etc/httpd.d/https.conf"
+  root "/htdocs/www.{{ domain }}"
+}

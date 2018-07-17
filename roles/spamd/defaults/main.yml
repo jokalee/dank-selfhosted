@@ -1,0 +1,7 @@
+---
+spamd_passtime: 2     # delivery can be retried after 2 minutes
+spamd_greyexp: 4      # greylisted entries expire after 4 hours
+spamd_whiteexp: 2190  # whitelisted entries expire after 3 months
+
+spamd_blacklists:
+  nixspam: www.openbsd.org/spamd/nixspam.gz

@@ -1,0 +1,49 @@
+---
+- name: install packages
+  openbsd_pkg:
+    name: ldns-utils
+    state: present
+
+- name: generate nsd.conf
+  template:
+    src: nsd.conf.j2
+    dest: /var/nsd/etc/nsd.conf
+    owner: root
+    group: _nsd
+    mode: 0640
+  notify: reload nsd
+
+- name: get current serial
+  command: grep -Eo '{{ ansible_date_time.year + ansible_date_time.month + ansible_date_time.day }}[[:digit:]]{2}' /var/nsd/zones/master/{{ domain }}.zone
+  changed_when: False
+  failed_when: False
+  register: current_serial
+
+- import_tasks: generate_keys.yml
+- import_tasks: get_dkim.yml
+- import_tasks: get_sshfp.yml
+- import_tasks: get_tlsa.yml
+- import_tasks: check_zonefile.yml
+
+- import_tasks: generate_zonefile.yml
+  when: zonefile_changed is not defined or zonefile_changed
+
+- name: copy resign-zone script
+  copy:
+    src: resign-zone.sh
+    dest: /usr/local/sbin/resign-zone
+    mode: 0555
+
+- name: add resign-zone cron job
+  cron:
+    name: resign-zone {{ domain }}
+    special_time: daily
+    job: /usr/local/sbin/resign-zone {{ domain }}
+
+- name: start and enable daemon
+  service:
+    name: nsd
+    enabled: yes
+    state: started
+
+- meta: flush_handlers

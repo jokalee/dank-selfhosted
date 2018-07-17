@@ -1,0 +1,18 @@
+server "default" {
+  listen on * port 80
+  listen on :: port 80
+  log style combined
+
+  root "/nonexistent"
+
+  location "/.well-known/acme-challenge/*" {
+    root "/acme"
+    root strip 2
+  }
+
+  location * {
+    block return 301 "https://www.{{ domain }}"
+  }
+}
+
+include "/etc/httpd.d/sites.conf"

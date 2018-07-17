@@ -1,0 +1,19 @@
+# compute TLSA records for DANE etc
+---
+- name: check if certificate exists
+  stat:
+    path: /etc/ssl/{{ domain }}.fullchain.pem
+  register: ssl_cert_file
+
+- block:
+    - name: get sha256 of ssl cert
+      shell: openssl x509 -in /etc/ssl/{{ domain }}.fullchain.pem -pubkey -noout | openssl rsa -pubin -outform DER | openssl sha256 | cut -d ' ' -f 2
+      register: openssl_sha256
+      changed_when: False
+      failed_when: "'error' in openssl_sha256.stderr | lower"
+
+    - name: set ssl_cert_sha256
+      set_fact:
+        ssl_cert_sha256: '{{ openssl_sha256.stdout }}'
+
+  when: ssl_cert_file.stat.exists

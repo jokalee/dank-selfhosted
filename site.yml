@@ -1,0 +1,12 @@
+- name: make this server a dank selfhosting machine
+  hosts: local
+  vars_files:
+    - vars.yml
+  roles:
+    - base
+    - httpd
+    - acme
+    - nsd
+    - smtpd
+    - spamd
+    - prosody

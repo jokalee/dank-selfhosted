@@ -1,0 +1,19 @@
+server:
+  ip-address: {{ ip }}
+  ip-address: {{ ip6 }}
+  ip-transparent: yes
+  server-count: {{ ansible_processor_cores }}
+  hide-version: yes
+  verbosity: 1
+  database: /var/nsd/db/nsd.db
+
+remote-control:
+  control-enable: yes
+
+zone:
+  name: {{ domain }}
+  zonefile: "master/{{ domain }}.zone.signed"
+{% for nameserver in secondary_nameservers %}
+  notify: {{ nameserver }} NOKEY
+  provide-xfr: {{ nameserver }} NOKEY
+{% endfor %}

@@ -1,0 +1,3 @@
+{% for cidr in spamd_whitelist | default([]) %}
+{{ cidr }}
+{% endfor %}

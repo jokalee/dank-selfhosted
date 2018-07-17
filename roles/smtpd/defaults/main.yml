@@ -1,0 +1,3 @@
+---
+dkim_listen_port: 10027
+dkim_relay_port: 10028

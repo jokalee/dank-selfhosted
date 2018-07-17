@@ -1,0 +1,21 @@
+---
+spfwalk_cmd: smtpctl spf walk < /etc/mail/bigmailers.txt | pfctl -t bigmailers -T add -f -
+
+bigmailers:
+  - aliexpress.com
+  - amazon.com
+  - ebay.com
+  - github.com
+  - google.com
+  - icloud.com
+  - kijiji.com
+  - linkedin.com
+  - mandrillapp.com
+  - mailchimp.com
+  - microsoft.com
+  - outlook.com
+  - paypal.com
+  - sendgrid.net
+  - t-mobile.com
+  - verizon.com
+  - yahoo.com

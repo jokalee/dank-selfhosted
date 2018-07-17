@@ -1,0 +1,57 @@
+---
+- name: generate spamd.conf
+  template:
+    src: spamd.conf.j2
+    dest: /etc/mail/spamd.conf
+  notify: restart spamd
+
+- name: generate whitelist.txt
+  template:
+    src: whitelist.txt.j2
+    dest: /etc/mail/whitelist.txt
+  notify: reload whitelist
+
+- name: generate bigmailers.txt
+  template:
+    src: bigmailers.txt.j2
+    dest: /etc/mail/bigmailers.txt
+  notify: spf walk
+
+- name: add spamd-setup to crontab
+  cron:
+    name: spamd-setup
+    special_time: daily
+    job: sleep $((RANDOM \% 2048)) && /usr/libexec/spamd-setup
+
+- name: add @daily bigmailers spf walk to crontab
+  cron:
+    name: spf walk
+    special_time: daily
+    job: '{{ spfwalk_cmd }}'
+
+- name: add @reboot bigmailers spf walk to crontab
+  cron:
+    name: spf walk on reboot
+    special_time: reboot
+    job: sleep 20 && {{ spfwalk_cmd }}
+
+- name: enable daemon
+  lineinfile:
+    dest: /etc/rc.conf.local
+    regexp: ^spamd_flags=
+    line: spamd_flags="-G {{ spamd_passtime }}:{{ spamd_greyexp }}:{{ spamd_whiteexp }} -h mail.{{ domain }} -C /etc/ssl/{{ domain }}.fullchain.pem -K /etc/ssl/private/{{ domain }}.key"
+    create: yes
+  notify: restart spamd
+
+- name: start daemon
+  service:
+    name: spamd
+    state: started
+
+- name: add acme hook
+  copy:
+    content: |
+      #!/bin/sh
+      rcctl restart spamd
+    dest: /etc/acme/hooks.d/spamd.sh
+    mode: 0555

@@ -1,0 +1,13 @@
+all:\
+{% for name in spamd_blacklists.keys() %}
+	:{{ name }}:{% if not loop.last %}\{% endif %}
+{% endfor %}
+
+
+{% for name, url in spamd_blacklists.iteritems() %}
+{{ name }}:\
+	:black:\
+	:msg="Blocked: your address %A is in the {{ name }} list":\
+	:method=http:\
+	:file={{ url }}
+{% endfor %}

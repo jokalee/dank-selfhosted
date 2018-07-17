@@ -1,0 +1,15 @@
+---
+tlsa_records:
+  - { port: 25,   proto: 'tcp', host: 'mail' }
+  - { port: 587,  proto: 'tcp', host: 'mail' }
+  - { port: 993,  proto: 'tcp', host: 'mail' }
+  - { port: 443,  proto: 'tcp', host: 'www'  }
+  - { port: 443,  proto: 'tcp' }
+  - { port: 5222, proto: 'tcp', host: 'xmpp' }
+  - { port: 5269, proto: 'tcp', host: 'xmpp' }
+
+srv_records:
+  - { service: 'submission',  port: 587,  proto: 'tcp', host: 'mail' }
+  - { service: 'imaps',       port: 993,  proto: 'tcp', host: 'mail' }
+  - { service: 'xmpp-client', port: 5222, proto: 'tcp', host: 'xmpp' }
+  - { service: 'xmpp-server', port: 5269, proto: 'tcp', host: 'xmpp' }

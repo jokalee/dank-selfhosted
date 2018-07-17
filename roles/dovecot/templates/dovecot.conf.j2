@@ -1,0 +1,115 @@
+protocols = imap lmtp
+
+# auth
+auth_mechanisms = plain
+
+passdb {
+  driver = bsdauth
+}
+
+userdb {
+  driver = passwd
+}
+
+# mail
+mail_location = maildir:~/Maildir
+namespace inbox {
+  separator = /
+  inbox = yes
+}
+
+mmap_disable = yes
+first_valid_uid = 1000
+mail_plugin_dir = /usr/local/lib/dovecot
+mbox_write_locks = fcntl
+
+# master
+mail_fsync = never
+
+service pop3-login {
+  inet_listener pop3 {
+    port = 0
+  }
+  inet_listener pop3s {
+    port = 0
+  }
+}
+
+service imap-login {
+  inet_listener imap {
+    address = 127.0.0.1, ::1
+  }
+  service_count = 0
+  process_min_avail = {{ ansible_processor_cores }}
+  vsz_limit = 1G
+}
+
+service imap {
+  service_count = 256
+  process_min_avail = {{ ansible_processor_cores }}
+}
+
+service auth {
+  unix_listener /var/prosody/dovecot-auth {
+    mode = 0660
+    user = _prosody
+    group = _prosody
+  }
+  client_limit = 2048
+}
+
+# ssl
+ssl = required
+ssl_cert =</etc/ssl/{{ domain }}.fullchain.pem
+ssl_key =</etc/ssl/private/{{ domain }}.key
+ssl_protocols = !SSLv2 !SSLv3 !TLSv1 !TLSv1.1 TLSv1.2
+
+# lda
+protocol lda {
+  mail_fsync = optimized
+  mail_plugins = $mail_plugins sieve
+}
+
+# lmtp
+protocol lmtp {
+  mail_fsync = optimized
+  mail_plugins = $mail_plugins sieve
+}
+
+# imap
+protocol imap {
+  mail_max_userip_connections = 50
+  mail_plugins = $mail_plugins imap_sieve
+}
+
+# mailboxes
+namespace inbox {
+  mailbox INBOX {
+    auto = subscribe
+  }
+  mailbox Drafts {
+    auto = subscribe
+    special_use = \Drafts
+  }
+  mailbox Junk {
+    auto = subscribe
+    special_use = \Junk
+  }
+  mailbox Trash {
+    auto = subscribe
+    special_use = \Trash
+  }
+  mailbox Archive {
+    auto = subscribe
+    special_use = \Archive
+  }
+  mailbox Sent {
+    auto = subscribe
+    special_use = \Sent
+  }
+}
+
+plugin {
+  sieve = file:~/.sieve;active=~/.dovecot.sieve
+  recipient_delimiter = +
+}

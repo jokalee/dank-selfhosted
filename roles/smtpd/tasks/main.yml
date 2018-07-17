@@ -1,0 +1,29 @@
+---
+- name: create table files
+  template:
+    src: '{{ item }}.j2'
+    dest: /etc/mail/{{ item }}
+  with_items:
+    - local_aliases
+    - aliases
+  notify: makemap
+
+- name: generate smtpd.conf
+  template:
+    src: smtpd.conf.j2
+    dest: /etc/mail/smtpd.conf
+  notify: restart smtpd
+
+- name: enable and start daemon
+  service:
+    name: smtpd
+    enabled: yes
+    state: started
+
+- name: add acme hook
+  copy:
+    content: |
+      #!/bin/sh
+      rcctl restart smtpd
+    dest: /etc/acme/hooks.d/smtpd.sh
+    mode: 0555

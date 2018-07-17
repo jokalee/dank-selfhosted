@@ -1,0 +1,13 @@
+Port {{ sshd_port }}
+
+PermitRootLogin no
+AuthorizedKeysFile	.ssh/authorized_keys
+
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+
+Banner none
+VersionAddendum none
+Subsystem	sftp	internal-sftp
+
+AllowGroups ssh

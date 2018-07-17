@@ -10,7 +10,7 @@ setting a few variables in `vars.yml`.
 ## TLDR
 
 1. Configure a [secondary DNS provider](https://cp.dnsmadeeasy.com/u/122648) and set them as your nameservers at your registrar. Set up reverse DNS for your server.
-2. `./scripts/bootstrap_openbsd.sh YOURUSERNAME`
+2. `./scripts/bootstrap_openbsd.sh`
 3. `cp vars-sample.yml vars.yml && vi vars.yml`
 4. `ansible-playbook site.yml`
 5. `./scripts/ds_records.sh YOURDOMAIN` and set DS records at your registrar for DNSSEC.
@@ -59,7 +59,7 @@ setting a few variables in `vars.yml`.
 
 1. Boot up your OpenBSD server.
 2. Create at least one user account. You will use this account to administer the system, so make sure to add yourself to the `wheel` group.
-3. Run `scripts/bootstrap_openbsd.sh YOURUSERNAME` as root to add a package repo URL and set up [doas](http://man.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/doas.1) for your user (required for Ansible).
+3. Run `scripts/bootstrap_openbsd.sh` as root to add a package repo URL and set up [doas](http://man.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/doas.1) for your user (required for Ansible).
 4. Configure your secondary DNS provider to accept `NOTIFYs` and perform zone transfers from your server's IP address.
 5. `cp vars-sample.yml vars.yml` and edit the configuration to your liking.
 6. Run the playbook! `ansible-playbook site.yml`

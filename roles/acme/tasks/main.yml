@@ -1,0 +1,56 @@
+---
+- name: generate acme-client.conf
+  template:
+    src: acme-client.conf.j2
+    dest: /etc/acme-client.conf
+
+- name: wait for DNS to propagate (checking www.{{ domain }})
+  shell: dig +short @8.8.8.8 A www.{{ domain }}
+  changed_when: False
+  register: dig_domain
+  until: dig_domain.stdout == ip
+  delay: 10
+  retries: 30
+
+- name: run acme-client for {{ domain }}
+  command: acme-client -AD {{ domain }}
+  register: acme_client
+  failed_when: acme_client.rc == 1
+  changed_when: acme_client.rc == 0
+  notify: run acme hooks
+
+- name: fetch ocsp
+  command: ocspcheck -No /etc/ssl/{{ domain }}.der /etc/ssl/{{ domain }}.fullchain.pem
+  args:
+    creates: /etc/ssl/{{ domain }}.der
+  notify: reload httpd
+
+- name: re-run NSD role to generate TLSA records
+  include_role:
+    name: nsd
+  when: acme_client.changed
+
+- name: create acme hooks directory
+  file:
+    path: /etc/acme/hooks.d
+    state: directory
+
+- name: copy hook runner
+  copy:
+    src: run-hooks.sh
+    dest: /etc/acme/run-hooks.sh
+    mode: 0555
+
+- name: add acme-client to crontab
+  cron:
+    name: acme-client {{ domain }}
+    job: acme-client {{ domain }} && /etc/acme/run-hooks.sh
+    hour: 5
+    minute: 22
+
+- name: add ocspcheck to crontab
+  cron:
+    name: ocspcheck {{ domain }}
+    job: ocspcheck -No /etc/ssl/{{ domain }}.der /etc/ssl/{{ domain }}.fullchain.pem && rcctl reload httpd
+    hour: 5
+    minute: 23

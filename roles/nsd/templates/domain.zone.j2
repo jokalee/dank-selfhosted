@@ -1,0 +1,70 @@
+$TTL    10800
+$ORIGIN {{ domain }}.
+@  1D  IN  SOA ns1.{{ domain }}.  root.{{ domain }}. (
+        {{ serial }} ; serial
+        1d ; refresh
+        3m ; retry
+        1w ; expire
+        3h ; minimum
+)
+
+{% for nameserver in public_nameservers %}
+    IN  NS     ns{{ loop.index }}.{{ domain }}.
+{% endfor %}
+    IN  MX  10 mail.{{ domain }}.
+
+; host definitions
+@ IN A {{ ip }}
+@ IN AAAA {{ ip6 }}
+{{ hostname }} IN A {{ ip }}
+{{ hostname }} IN AAAA {{ ip6 }}
+www IN A {{ ip }}
+www IN AAAA {{ ip6 }}
+mail IN A {{ ip }}
+; do NOT issue an AAAA record for mail - spamd doesnt support ipv6!
+xmpp IN A {{ ip }}
+xmpp IN AAAA {{ ip6 }}
+conference IN A {{ ip }}
+conference IN AAAA {{ ip6 }}
+proxy IN A {{ ip }}
+proxy IN AAAA {{ ip6 }}
+
+{% for name, record in (dns_records | default({})).iteritems() %}
+{{ name }} IN A {{ record.ip }}
+{% if record.ip6 is defined %}
+{{ name }} IN AAAA {{ record.ip6 }}
+{% endif %}
+{% endfor %}
+
+{% for addr in public_nameservers %}
+ns{{ loop.index }} IN A {{ addr }}
+{% endfor %}
+{% for addr in public_nameservers_ip6 %}
+ns{{ loop.index }} IN AAAA {{ addr }}
+{% endfor %}
+
+; DKIM
+{{ dkim_records }}
+
+; SRV records
+{% for r in srv_records %}
+_{{ r.service }}._{{ r.proto }}{{ '.'+r.subdomain if r.subdomain is defined else '' }} IN SRV 0 1 {{ r.port }} {{ r.host }}.{{ domain }}.
+{% endfor %}
+
+; antispam
+@ IN TXT "v=spf1 mx -all"
+_dmarc IN TXT "v=DMARC1; p=none"
+
+; CAA
+@ IN CAA 0 issue "letsencrypt.org"
+@ IN CAA 0 issuewild "letsencrypt.org"
+
+; SSHFP
+{{ sshfp_records }}
+
+; TLSA
+{% if ssl_cert_sha256 is defined %}
+{% for r in tlsa_records %}
+_{{ r.port }}._{{ r.proto }}{{ '.'+r.host if r.host is defined else '' }} IN TLSA 3 1 1 {{ ssl_cert_sha256 }}
+{% endfor %}
+{% endif %}

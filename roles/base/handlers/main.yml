@@ -1,0 +1,23 @@
+- name: restart ntpd
+  service:
+    name: ntpd
+    state: restarted
+
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted
+
+- name: rebuild login database
+  command: cat_mkdb /etc/login.conf
+
+- name: reload pf
+  command: pfctl -f /etc/pf.conf
+
+- name: reload syslog
+  service:
+    name: syslogd
+    state: reloaded
+
+- name: newsyslog
+  command: newsyslog

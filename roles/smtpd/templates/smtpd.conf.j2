@@ -1,0 +1,15 @@
+pki mail.{{ domain }} certificate "/etc/ssl/{{ domain }}.fullchain.pem"
+pki mail.{{ domain }} key "/etc/ssl/private/{{ domain }}.key"
+
+listen on lo0
+listen on lo0 port {{ dkim_relay_port }} tag DKIM
+listen on egress inet4 tls pki mail.{{ domain }}
+listen on egress inet4 mask-source port 587 tls-require pki mail.{{ domain }} auth
+
+table local_aliases db:/etc/mail/local_aliases.db
+table aliases db:/etc/mail/aliases.db
+
+accept from local for local alias <local_aliases> deliver to lmtp "/var/dovecot/lmtp"
+accept from any for domain {{ domain }} alias <aliases> deliver to lmtp "/var/dovecot/lmtp"
+accept tagged DKIM for any relay source {{ ip }} hostname mail.{{ domain }}
+accept from local for any relay via smtp://127.0.0.1:{{ dkim_listen_port }}

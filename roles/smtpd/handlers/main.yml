@@ -1,0 +1,13 @@
+---
+- name: makemap aliases
+  command: makemap -t aliases /etc/mail/aliases
+  listen: makemap
+
+- name: makemap local_aliases
+  command: makemap -t aliases /etc/mail/local_aliases
+  listen: makemap
+
+- name: restart smtpd
+  service:
+    name: smtpd
+    state: restarted

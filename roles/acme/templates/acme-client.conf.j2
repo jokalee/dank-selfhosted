@@ -1,0 +1,13 @@
+authority letsencrypt {
+  api url "https://acme-v01.api.letsencrypt.org/directory"
+  account key "/etc/acme/letsencrypt.key"
+}
+
+domain {{ domain }} {
+  alternative names { www.{{ domain }}  xmpp.{{ domain }} mail.{{ domain }} }
+  domain key "/etc/ssl/private/{{ domain }}.key"
+  domain certificate "/etc/ssl/{{ domain }}.crt"
+  domain chain certificate "/etc/ssl/{{ domain }}.chain.pem"
+  domain full chain certificate "/etc/ssl/{{ domain }}.fullchain.pem"
+  sign with letsencrypt
+}

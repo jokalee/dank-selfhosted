@@ -1,0 +1,22 @@
+- name: get next serial
+  set_fact:
+    serial: "{{ (current_serial.stdout | int) + 1 if current_serial.rc == 0 else ansible_date_time.year + ansible_date_time.month + ansible_date_time.day + '00' }}"
+
+- name: generate zone file
+  template:
+    src: domain.zone.j2
+    dest: /var/nsd/zones/master/{{ domain }}.zone
+  notify: reload nsd
+
+- name: sign zone file
+  shell: >
+    ldns-signzone -n
+    -e $(echo "$(date +%s) + (30 * 24 * 60 * 60)" | bc)
+    -s $(head -n 1024 /dev/urandom | sha1 | cut -b 1-16)
+    -f /var/nsd/zones/master/{{ domain }}.zone.signed
+    /var/nsd/zones/master/{{ domain }}.zone
+    {{ domain }}.zsk
+    {{ domain }}.ksk
+  args:
+    chdir: /var/nsd/keys
+  notify: reload nsd

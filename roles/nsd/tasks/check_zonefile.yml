@@ -1,0 +1,32 @@
+# checks if the zonefile will change. if so, new serial is needed.
+---
+- name: stat current zone file
+  stat:
+    path: /var/nsd/zones/master/{{ domain }}.zone
+  register: current_zone_file
+
+- block:
+    - name: create temporary zone file
+      template:
+        src: domain.zone.j2
+        dest: /tmp/{{ domain }}.zone.tmp
+      vars:
+        serial: '{{ current_serial.stdout }}'
+      changed_when: False
+
+    - name: stat temporary zone file
+      stat:
+        path: /tmp/{{ domain }}.zone.tmp
+      register: temp_zone_file
+
+    - name: check if zone file will change
+      set_fact:
+        zonefile_changed: '{{ current_zone_file.stat.checksum != temp_zone_file.stat.checksum }}'
+
+    - name: remove temporary zone file
+      file:
+        path: /tmp/{{ domain }}.zone.tmp
+        state: absent
+      changed_when: False
+
+  when: current_zone_file.stat.exists

@@ -1,0 +1,10 @@
+# store DKIM records into dkim_records variable
+---
+- name: read dkim records file
+  slurp:
+    src: /etc/mail/dkim/dkim.txt
+  register: dkim_records_b64
+
+- name: set dkim records
+  set_fact:
+    dkim_records: '{{ dkim_records_b64.content | b64decode }}'

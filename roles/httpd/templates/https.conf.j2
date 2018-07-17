@@ -1,0 +1,10 @@
+listen on * tls port 443
+listen on :: tls port 443
+
+log style combined
+
+tls certificate "/etc/ssl/{{ domain }}.fullchain.pem"
+tls key "/etc/ssl/private/{{ domain }}.key"
+tls ocsp "/etc/ssl/{{ domain }}.der"
+
+hsts { max-age 31536000, preload, subdomains }

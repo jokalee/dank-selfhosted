@@ -1,0 +1,5 @@
+search {{ domain }}
+{% for nameserver in nameservers %}
+nameserver {{ nameserver }}
+{% endfor %}
+lookup file bind

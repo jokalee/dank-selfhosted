@@ -1,0 +1,19 @@
+listen_addresses = ''
+max_connections = 30
+
+shared_buffers = 128MB
+dynamic_shared_memory_type = posix
+
+datestyle = 'iso, mdy'
+timezone = 'US/Eastern'
+lc_messages = 'C'
+lc_monetary = 'C'
+lc_numeric = 'C'
+lc_time = 'C'
+default_text_search_config = 'pg_catalog.english'
+
+log_destination = 'syslog'
+log_min_messages = notice
+log_min_error_statement = warning
+log_timezone = 'US/Eastern'
+log_line_prefix = ''

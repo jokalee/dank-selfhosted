@@ -1,0 +1,5 @@
+sensor *
+constraints from "https://www.google.com"
+{% for server in ntp_servers %}
+server {{ server }}
+{% endfor %}

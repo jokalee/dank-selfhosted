@@ -1,0 +1,11 @@
+---
+- name: restart spamd
+  service:
+    name: spamd
+    state: restarted
+
+- name: reload whitelist
+  command: pfctl -t nospamd -T replace -f /etc/mail/whitelist.txt
+
+- name: spf walk
+  shell: '{{ spfwalk_cmd }}'

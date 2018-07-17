@@ -1,0 +1,6 @@
+listen 127.0.0.1:{{ dkim_listen_port }}
+relay 127.0.0.1:{{ dkim_relay_port }}
+domain {{ domain }}
+keyfile /etc/mail/dkim/private.key
+selector dkim
+signature dkim(c=relaxed/relaxed,a=rsa-sha256)

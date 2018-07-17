@@ -1,0 +1,67 @@
+---
+- name: create configuration directories
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - /etc/sites
+    - /etc/httpd.d
+
+- name: create sites.conf
+  copy:
+    content: ''
+    dest: /etc/httpd.d/sites.conf
+    force: no
+
+- name: delete sample site
+  file:
+    path: /var/www/htdocs/bgplg
+    state: absent
+
+- name: generate configuration
+  template:
+    src: '{{ item.0 }}.j2'
+    dest: '{{ item.1 }}/{{ item.0 }}'
+  with_together:
+    - [ 'httpd.conf', 'http.conf',    'https.conf'   ]
+    - [ '/etc',       '/etc/httpd.d', '/etc/httpd.d' ]
+  notify: reload httpd
+
+- name: enable daemon
+  service:
+    name: httpd
+    enabled: yes
+    state: started
+
+- name: check if acme client has been bootstrapped
+  stat:
+    path: /etc/ssl/{{ domain }}.fullchain.pem
+  register: check_ssl_cert
+
+- block:
+    - meta: flush_handlers
+
+    - name: bootstrap acme client
+      include_role:
+        name: acme
+
+  when: not check_ssl_cert.stat.exists
+
+- name: generate configuration for vhost www.{{ domain }}
+  template:
+    src: www.conf.j2
+    dest: /etc/sites/www.{{ domain }}.conf
+  notify: reload httpd
+
+- name: enable vhost www.{{ domain }}
+  lineinfile:
+    path: /etc/httpd.d/sites.conf
+    line: include "/etc/sites/www.{{ domain }}.conf"
+
+- name: add acme hook
+  copy:
+    content: |
+      #!/bin/sh
+      rcctl reload httpd
+    dest: /etc/acme/hooks.d/httpd.sh
+    mode: 0555

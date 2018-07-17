@@ -1,0 +1,40 @@
+---
+- name: install packages
+  openbsd_pkg:
+    name: dkimproxy
+    state: installed
+
+- name: generate dkimproxy_out.conf
+  template:
+    src: dkimproxy_out.conf.j2
+    dest: /etc/dkimproxy_out.conf
+  notify: restart dkimproxy
+
+- name: create dkim key directory
+  file:
+    path: /etc/mail/dkim
+    owner: root
+    group: _dkimproxy
+    mode: 0750
+    state: directory
+
+- name: generate dkim private key
+  command: openssl genrsa -out /etc/mail/dkim/private.key 2048
+  args:
+    creates: /etc/mail/dkim/private.key
+
+- name: generate dkim public key
+  command: openssl rsa -in /etc/mail/dkim/private.key -pubout -out /etc/mail/dkim/public.key
+  args:
+    creates: /etc/mail/dkim/public.key
+
+- name: generate dkim TXT record
+  shell: ( echo p= ; grep -Ev -- '-+(BEGIN|END) PUBLIC KEY-+' /etc/mail/dkim/public.key) | tr -d '\n' | fold -w255 | awk 'BEGIN { print "dkim._domainkey     IN TXT ( \"v=DKIM1; k=rsa; \"" } { print "    " "\"" $0 "\"" } END { print ") ;" }' > /etc/mail/dkim/dkim.txt
+  args:
+    creates: /etc/mail/dkim/dkim.txt
+
+- name: enable and start daemon
+  service:
+    name: dkimproxy_out
+    enabled: yes
+    state: started

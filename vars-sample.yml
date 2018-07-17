@@ -1,0 +1,79 @@
+# Copy this file to vars.yml and make your changes. READ EACH OPTION CAREFULLY!
+# :-)
+---
+# ===== REQUIRED VARIABLES =====
+hostname: puffy             # the hostname of this machine
+domain: example.com         # your domain name
+
+username: your_username     # your username on this machine. account must already exist.
+ssh_keys:                   # you MUST add an SSH key for yourself here or you will be locked out!
+  - ssh-ed25519 AAAAasdf....
+
+interface: vio0             # name of your primary network interface
+ip: 203.0.113.41            # IPv4 address of this server
+ip6: 2001:db8::2            # IPv6 address of this server
+netmask: 255.255.255.0      # netmask (given to you by your hosting provider)
+gateway: 203.0.113.1        # default gateway (given to you by your hosting provider)
+nameservers:                # upstream DNS servers (given to you by your hosting provider)
+  - 8.8.8.8                 #   (but any public DNS servers will work)
+  - 8.8.4.4
+
+timezone: America/New_York  # your timezone
+
+secondary_nameservers:      # IP addresses of your slave nameservers (where to send NOTIFYs and zone XFERs)
+  - 203.0.113.200           #   This information should be given to you by your secondary DNS provider.
+  - 203.0.113.201           #   I recommend DNS Made Easy (https://dnsmadeeasy.com/)
+  - 203.0.113.202
+
+public_nameservers:         # IPv4 addresses of your secondary DNS provider's PUBLIC nameservers.
+  - 203.0.113.210           #   AKA where clients on the WWW should query for your domain. This
+  - 203.0.113.211           #   assumes a "hidden master" configuration. Not necessarily the same
+  - 203.0.113.212           #   addresses as above.
+
+public_nameservers_ip6:     # IPv6 addresses of your secondary DNS provider's PUBLIC nameservers.
+  - 2001:db8::10            #   Same as above, but for AAAA records.
+  - 2001:db8::11
+  - 2001:db8::12
+
+ntp_servers:                # Upstream NTP servers
+  - 0.us.pool.ntp.org       #   Your hosting provider may provide closer NTP servers in their datacenter.
+  - 1.us.pool.ntp.org       #   Otherwise, these are fine if you are in the USA.
+  - 2.us.pool.ntp.org
+  - 3.us.pool.ntp.org
+
+sshd_port: 11522            # SSH port. Don't choose 22 unless you like being hammered 24/7 by botnets!
+
+
+# ===== OPTIONAL VARIABLES =====
+ssh_users:                  # By default, only your user account is added to the ssh group. List any
+  - bob                     #  additional user accounts here to grant them SSH access. The accounts
+  - alice                   #  must already exist.
+
+spamd_whitelist:            # Mail from any IP or CIDR block listed here will never sent to spamd.
+  - 203.0.113.0/24
+
+dns_records:                # Any additional subdomains defined here will be added as A/AAAA records to
+  dankhost1:                # your zonefile.
+    ip: 203.0.113.240
+    ip6: 2001:db8::40
+  dankhost2:
+    ip: 203.0.113.241
+    ip6: 2001:db8::41
+
+open_ports:                 # By default, thie firewall blocks all inbound traffic except for the services
+  - 6000                    # managed by this playbook. List any additional TCP ports here that you'd like
+  - 6001                    # opened to the internet.
+  - 6002
+
+# Add any mail aliases here. The default example forwards all mail addressed to
+# root@example.com and administrator@exmaple.com to your mailbox.
+# All local mail for the superuser is forwarded to you by default.
+mail_aliases:
+  administrator: '{{ username }}'
+  root: '{{ username }}'
+
+
+# ===== OTHER OPTIONS =====
+# For an exhaustive list of options you can override, run the following command:
+#
+#   $ cat roles/*/defaults/*

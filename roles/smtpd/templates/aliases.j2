@@ -1,0 +1,3 @@
+{% for address, recipients in (mail_aliases | default({})).iteritems() %}
+{{ address }}: {{ ([recipients] if recipients is string else recipients) | join(', ') }}
+{% endfor %}
