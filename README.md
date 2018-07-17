@@ -104,7 +104,7 @@ if allof ( address :is "from" "root@hostname.example.com",
     - **Backup MX records:** I don't bother with a backup MX. They are a massive target for spammers, and legit mail servers will keep retrying delivery for multiple days if your primary MX goes down.
     - **Prosody:** periodically tar up the HTTP upload dir and do a `pg_dump` to save user info and message archives.
     - **Keys:** tar up your DNSSEC keys (`/var/nsd/keys`) and DKIM keys (`/etc/mail/dkim`)
-    - Assuming you copy all these items back to their origal location, the playbook won't generate new keys if they already exist.
+    - Assuming you copy all these items back to their original locations, the playbook won't generate new keys if they already exist.
 
 ## Resources
 
