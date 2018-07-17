@@ -1,6 +1,6 @@
 # dank-selfhosted
 
-![puffy deal with it](https://i.imgur.com/A46hkpd.gif)
+![puffy deal with it](https://i.imgur.com/A46hkpd.gif | width=300)
 
 Hi! This is my ansible playbook for self-hosting your own email, web hosting, XMPP chat,
 and DNS records using [OpenBSD](https://www.openbsd.org/). I use it to host everything on
