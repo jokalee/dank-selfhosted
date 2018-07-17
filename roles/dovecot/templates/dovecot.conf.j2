@@ -45,7 +45,6 @@ service imap-login {
 }
 
 service imap {
-  service_count = 256
   process_min_avail = {{ ansible_processor_cores }}
 }
 
