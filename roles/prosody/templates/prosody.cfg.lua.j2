@@ -71,6 +71,7 @@ proxy65_ports = { {{ prosody_proxy_port }} }
 http_upload_file_size_limit = {{ prosody_upload_maxsize }}
 http_upload_expire_after = {{ prosody_upload_expiration }}
 http_upload_quota = {{ prosody_upload_quota }}
+http_upload_path = "{{ prosody_upload_path }}"
 push_notification_with_body = {{ 'false' if prosody_push_anonymous else 'true' }}
 push_notification_with_sender = {{ 'false' if prosody_push_anonymous else 'true' }}
 

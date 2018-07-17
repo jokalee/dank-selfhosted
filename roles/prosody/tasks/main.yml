@@ -33,6 +33,14 @@
     dest: /usr/local/lib/prosody/community-modules
   notify: restart prosody
 
+- name: create prosody upload dir
+  file:
+    path: "{{ prosody_upload_path }}"
+    owner: _prosody
+    group: _prosody
+    mode: 0750
+    state: directory
+
 - name: generate configuration
   template:
     src: prosody.cfg.lua.j2
