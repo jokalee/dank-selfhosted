@@ -10,10 +10,10 @@ setting a few variables in `vars.yml`.
 ## TLDR
 
 1. Configure a [secondary DNS provider](https://cp.dnsmadeeasy.com/u/122648) and set them as your nameservers at your registrar. Set up reverse DNS for your server.
-2. `./scripts/boostrap_openbsd.sh`
+2. `./scripts/bootstrap_openbsd.sh YOURUSERNAME`
 3. `cp vars-sample.yml vars.yml && vi vars.yml`
 4. `ansible-playbook site.yml`
-5. `./scripts/ds_records.sh` and set DS records at your registrar for DNSSEC.
+5. `./scripts/ds_records.sh YOURDOMAIN` and set DS records at your registrar for DNSSEC.
 
 ## Assumptions
 
@@ -59,12 +59,12 @@ setting a few variables in `vars.yml`.
 
 1. Boot up your OpenBSD server.
 2. Create at least one user account. You will use this account to administer the system, so make sure to add yourself to the `wheel` group.
-3. Run `scripts/boostrap_openbsd.sh` as root to add a package repo URL and set up [doas](http://man.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/doas.1) for your user (required for Ansible).
+3. Run `scripts/bootstrap_openbsd.sh YOURUSERNAME` as root to add a package repo URL and set up [doas](http://man.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/doas.1) for your user (required for Ansible).
 4. Configure your secondary DNS provider to accept `NOTIFYs` and perform zone transfers from your server's IP address.
 5. `cp vars-sample.yml vars.yml` and edit the configuration to your liking.
 6. Run the playbook! `ansible-playbook site.yml`
 7. Ensure you have reverse DNS in place for your server's IP address. This is a critical step to avoid your outgoing mail being flagged as spam. At Vultr, this is configured under "Settings > IPv4". You should set one for your primary IPv6 address as well.
-8. The last step is to configure DS records for DNSSEC at your domain registrar. Run `scripts/ds_records.sh` to generate the records. At Namecheap, this is configured under "Advanced DNS > DNSSEC" in the web portal.
+8. The last step is to configure DS records for DNSSEC at your domain registrar. Run `scripts/ds_records.sh YOURDOMAIN` to generate the records. At Namecheap, this is configured under "Advanced DNS > DNSSEC" in the web portal.
 9. Yell at me on [Twitter](https://twitter.com/cullumsmith) when you inevitably find bugs in my code.
 
 ## Operational Notes
