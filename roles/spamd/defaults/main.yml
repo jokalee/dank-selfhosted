@@ -5,3 +5,22 @@ spamd_whiteexp: 2190  # whitelisted entries expire after 3 months
 
 spamd_blacklists:
   nixspam: www.openbsd.org/spamd/nixspam.gz
+
+bigmailers:
+  - aliexpress.com
+  - amazon.com
+  - ebay.com
+  - github.com
+  - google.com
+  - icloud.com
+  - kijiji.com
+  - linkedin.com
+  - mandrillapp.com
+  - mailchimp.com
+  - microsoft.com
+  - outlook.com
+  - paypal.com
+  - sendgrid.net
+  - t-mobile.com
+  - verizon.com
+  - yahoo.com
