@@ -44,7 +44,7 @@ setting a few variables in `vars.yml`.
     - [dkimproxy](http://dkimproxy.sourceforge.net/) for [DKIM](http://www.dkim.org/) signing of outgoing mail
 
 - Encryption Everywhere:
-    - Automated DNSSEC with cron tasks using `nsd` and `ldns-signzone` for daily zone re-signing and slave `NOTIFYs`
+    - Automated DNSSEC with `nsd` and cron tasks using `ldns-signzone` for daily zone re-signing and slave `NOTIFYs`
     - TLS for all public-facing services using LetsEncrypt certificates with automated renewal and daemon reload hooks
     - Automatic publishing of [SSHFP](https://tools.ietf.org/html/rfc4255) records for authoritative SSH fingerprints
     - Automatic publishing of [TLSA](https://tools.ietf.org/html/rfc6698) records for [DANE email encryption](https://halon.io/blog/what-is-dane/)
