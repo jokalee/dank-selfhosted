@@ -9,7 +9,7 @@
     state: restarted
 
 - name: rebuild login database
-  command: cat_mkdb /etc/login.conf
+  command: cap_mkdb /etc/login.conf
 
 - name: reload pf
   command: pfctl -f /etc/pf.conf
