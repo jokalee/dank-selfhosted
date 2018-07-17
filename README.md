@@ -71,7 +71,7 @@ setting a few variables in `vars.yml`.
 
 - **Login info:** the credentials for SMTP (STARTTLS, port 587) and IMAP (SSL, port 993) are simply your username (*without* the @domain.com portion) and login password. XMPP uses the `username@domain.com` syntax for logins, but the password is the same. Mail is stored under `~/Maildir` in each user's home directory for easy access using local clients like `mutt`.
 
-- **Email Filtering**: add a [sieve script](https://wiki2.dovecot.org/Pigeonhole/Sieve/Examples) to `~/.dovecot.sieve` to apply filters to your incoming mail. You can compile the sieve script and check for syntax errors using `sievec ~/.dovecot.sieve`. For example, to filter all your cron emails into a folder called `Logs`:
+- **Email Filtering**: any [sieve script](https://wiki2.dovecot.org/Pigeonhole/Sieve/Examples) located at `~/.dovecot.sieve` will automatically apply filters to your incoming mail. You can compile the sieve script and check for syntax errors using `sievec ~/.dovecot.sieve`. For example, to filter all your cron emails into a folder called `Logs`:
 
 ````
 require ["regex", "fileinto", "imap4flags", "mailbox", "envelope", "variables"];
