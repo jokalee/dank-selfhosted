@@ -24,6 +24,10 @@ setting a few variables in `vars.yml`.
 
 ## Goals
 
+- A small and secure OpenBSD platform to host email, DNS, XMPP chat, and some web sites.
+    - **Scale:** you and your family members, and maybe a few technically oriented friends.
+    - Really not suited for the general public, no automated password reset, web GUIS, etc.
+
 - Use as much of the OpenBSD base system as possible:
     - [acme-client(1)](https://man.openbsd.org/acme-client.1) for [LetsEncrypt](https://letsencrypt.org/) certificates
     - [smtpd(8)](https://man.openbsd.org/smtpd.8) for mail handling
@@ -78,3 +82,5 @@ setting a few variables in `vars.yml`.
 - **Virtual Hosts**: a default vhost will be created for `www.domain.com`, with a bare domain redirect. Shove HTML files into `/var/www/htdocs/www.domain.com` to start sharing your worthless opinions with the internet! To add more vhosts, just put a configuration file in `/etc/sites` and include it in `/etc/httpd.d/sites.conf`.
 
 - **Greylisting pitfalls:** `spamd` works by [greylisting](https://www.greylisting.org/). Unfortunately, big mailers like GMail often don't retry delivery from the same address, resulting in a greylist black hole described [here](https://poolp.org/posts/2018-01-08/spfwalk/). To alleviate this, I included a daily cron job that whitelists the IP addresses found in the SPF records for some of the big mailers like GMail and Yahoo. If you notice any other problematic domains, add them to the `bigmailers` list in `roles/spamd/vars/main.yml` to have their IP ranges whitelisted. (And be sure to send me a pull request!)
+
+- **Password Resets:** I'm leaving password management up to you. Since this configuration uses plain UNIX accounts, you won't be able to add a password reset webpage without some kind crappy setuid CGI script (yikes!). Look into LDAP authentication if you have a bunch of non-neckbeard users. Otherwise, `man login.conf` for information on enforcing password expiration and complexity.
