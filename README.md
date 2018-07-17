@@ -85,7 +85,7 @@ setting a few variables in `vars.yml`.
 
 - **Greylisting pitfalls:** `spamd` works by [greylisting](https://www.greylisting.org/). Unfortunately, big mailers like GMail often don't retry delivery from the same address, resulting in a greylist black hole described [here](https://poolp.org/posts/2018-01-08/spfwalk/). To alleviate this, I included a daily cron job that whitelists the IP addresses found in the SPF records for some of the big mailers like GMail and Yahoo. If you notice any other problematic domains, add them to the `bigmailers` list in `roles/spamd/vars/main.yml` to have their IP ranges whitelisted. (And be sure to send me a pull request!)
 
-- **Password Resets:** I'm leaving password management up to you. Since this configuration uses plain UNIX accounts, you won't be able to add a password reset webpage without some kind crappy setuid CGI script (yikes!). Look into LDAP authentication if you have a bunch of non-neckbeard users. Otherwise, `man login.conf` for information on enforcing password expiration and complexity.
+- **Password Resets:** I'm leaving password management up to you. Since this configuration uses plain UNIX accounts, you won't be able to add a password reset webpage without some kind of crappy setuid CGI script (yikes!). Look into LDAP authentication if you have a bunch of non-neckbeard users. Otherwise, `man login.conf` for information on enforcing password expiration and complexity.
 
 ## Resources
 
