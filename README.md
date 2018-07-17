@@ -71,6 +71,8 @@ setting a few variables in `vars.yml`.
 
 - **Login info:** the credentials for SMTP (STARTTLS, port 587) and IMAP (SSL, port 993) are simply your username (*without* the @domain.com portion) and login password. XMPP uses the `username@domain.com` syntax for logins, but the password is the same. Mail is stored under `~/Maildir` in each user's home directory for easy access using local clients like `mutt`.
 
+- **Email Filtering**: add a [sieve script](https://wiki2.dovecot.org/Pigeonhole/Sieve/Examples) to `~/.dovecot.sieve` to apply filters to your incoming mail.
+
 - **XMPP Chat:** the XMPP server, Prosody, is really slick. As configured here, it supports HTTP file upload for image sharing, delivery to multiple devices via carbons, push notifications, group chats, message history, and basically everything you'd expect from a modern chat solution. XMPP isn't all bad! The best clients are [ChatSecure](https://chatsecure.org/) for iOS, [Conversations](https://conversations.im/) for Android, and [Gajim](https://gajim.org/) for *nix and Windows. No decent clients for OS X, sadly. All those clients support end-to-end crypto via [OMEMO](https://conversations.im/omemo/). Easily federate with others on separate XMPP servers for truly decentralized, open communication!
 
 - **Additional accounts**: to add more accounts, just use `adduser`. Unless they need a shell, it's probably best to set their shell to `/sbin/nologin`.
