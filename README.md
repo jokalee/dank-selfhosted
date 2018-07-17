@@ -7,6 +7,14 @@ and DNS records using [OpenBSD](https://www.openbsd.org/). I use it to host ever
 [c0ffee.net](https://www.c0ffee.net), but you can easily adapt it for your own domain by
 setting a few variables in `vars.yml`.
 
+## TLDR
+
+1. Configure a [secondary DNS provider](https://cp.dnsmadeeasy.com/u/122648) and set them as your nameservers at your registrar. Set up reverse DNS for your server.
+2. `./scripts/boostrap_openbsd.sh`
+3. `cp vars-sample.yml vars.yml && vi vars.yml`
+4. `ansible-playbook site.yml`
+5. `./scripts/ds_records.sh` and set DS records at your registrar for DNSSEC.
+
 ## Assumptions
 
 - You have a public-facing server (probably a VPS) running OpenBSD, with an IPv4 and IPv6 address. I recommend [Vultr](https://www.vultr.com/?ref=6845125).
@@ -32,7 +40,7 @@ setting a few variables in `vars.yml`.
     - [dkimproxy](http://dkimproxy.sourceforge.net/) for [DKIM](http://www.dkim.org/) signing of outgoing mail
 
 - Encryption Everywhere:
-    - Automated DNSSEC with cron tasks using `nsd` and `ldns-signzone` for daily zone re-signing and slave `NOTIFY`s
+    - Automated DNSSEC with cron tasks using `nsd` and `ldns-signzone` for daily zone re-signing and slave `NOTIFYs`
     - TLS for all public-facing services using LetsEncrypt certificates with automated renewal and daemon reload hooks
     - Automatic publishing of [SSHFP](https://tools.ietf.org/html/rfc4255) records for authoritative SSH fingerprints
     - Automatic publishing of [TLSA](https://tools.ietf.org/html/rfc6698) records for [DANE email encryption](https://halon.io/blog/what-is-dane/)
@@ -48,7 +56,7 @@ setting a few variables in `vars.yml`.
 1. Boot up your OpenBSD server.
 2. Create at least one user account. You will use this account to administer the system, so make sure to add yourself to the `wheel` group.
 3. Run `scripts/boostrap_openbsd.sh` as root to add a package repo URL and set up [doas](http://man.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/doas.1) for your user (required for Ansible).
-4. Configure your secondary DNS provider to accept `NOTIFY`s and perform zone transfers from your server's IP address.
+4. Configure your secondary DNS provider to accept `NOTIFYs` and perform zone transfers from your server's IP address.
 5. `cp vars-sample.yml vars.yml` and edit the configuration to your liking.
 6. Run the playbook! `ansible-playbook site.yml`
 7. Ensure you have reverse DNS in place for your server's IP address. This is a critical step to avoid your outgoing mail being flagged as spam. At Vultr, this is configured under "Settings > IPv4". You should set one for your primary IPv6 address as well.
@@ -58,6 +66,8 @@ setting a few variables in `vars.yml`.
 ## Operational Notes
 
 - **Login info:** the credentials for SMTP (STARTTLS, port 587) and IMAP (SSL, port 993) are simply your username (*without* the @domain.com portion) and login password. XMPP uses the `username@domain.com` syntax for logins, but the password is the same. Mail is stored under `~/Maildir` in each user's home directory for easy access using local clients like `mutt`.
+
+- **XMPP Chat:** the XMPP server, Prosody, is really slick. As configured here, it supports HTTP file upload for image sharing, delivery to multiple devices via carbons, push notifications, group chats, message history, and basically everything you'd expect from a modern chat solution. XMPP isn't all bad! The best clients are [ChatSecure](https://chatsecure.org/) for iOS, [Conversations](https://conversations.im/) for Android, and [Gajim](https://gajim.org/) for *nix and Windows. No decent clients for OS X, sadly. All those clients support end-to-end crypto via [OMEMO](https://conversations.im/omemo/). Easily federate with others on separate XMPP servers for truly decentralized, open communication!
 
 - **Additional accounts**: to add more accounts, just use `adduser`. Unless they need a shell, it's probably best to set their shell to `/sbin/nologin`.
 
