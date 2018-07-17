@@ -73,7 +73,8 @@ setting a few variables in `vars.yml`.
 
 - **Email Filtering**: add a [sieve script](https://wiki2.dovecot.org/Pigeonhole/Sieve/Examples) to `~/.dovecot.sieve` to apply filters to your incoming mail. You can compile the sieve script and check for syntax errors using `sievec ~/.dovecot.sieve`. For example, to filter all your cron emails into a folder called `Logs`:
 
-````require ["regex", "fileinto", "imap4flags", "mailbox", "envelope", "variables"];
+````
+require ["regex", "fileinto", "imap4flags", "mailbox", "envelope", "variables"];
 
 if allof ( address :is "from" "root@hostname.example.com",
            anyof ( header :contains "subject" "cron",
