@@ -82,7 +82,6 @@ if allof ( address :is "from" "root@hostname.example.com",
   fileinto :create "Logs";
   stop;
 }
-
 ````
 
 - **XMPP Chat:** the XMPP server, Prosody, is really slick. As configured here, it supports HTTP file upload for image sharing, delivery to multiple devices via carbons, push notifications, group chats, message history, and basically everything you'd expect from a modern chat solution. XMPP isn't all that bad! The best clients are [ChatSecure](https://chatsecure.org/) for iOS, [Conversations](https://conversations.im/) for Android, and [Gajim](https://gajim.org/) for *nix and Windows. No decent clients for OS X, sadly. All those clients support end-to-end crypto via [OMEMO](https://conversations.im/omemo/). Easily federate with others on separate XMPP servers for truly decentralized, open communication!
