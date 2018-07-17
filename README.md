@@ -26,7 +26,7 @@ setting a few variables in `vars.yml`.
 
 - A small and secure OpenBSD platform to host email, DNS, XMPP chat, and some web sites.
     - **Scale:** you and your family members, and maybe a few technically oriented friends.
-    - Really not suited for the general public, no automated password reset, web GUIS, etc.
+    - Really not suited for the general public, no automated password reset, no web GUIs...
 
 - Use as much of the OpenBSD base system as possible:
     - [acme-client(1)](https://man.openbsd.org/acme-client.1) for [LetsEncrypt](https://letsencrypt.org/) certificates
