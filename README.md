@@ -98,6 +98,14 @@ if allof ( address :is "from" "root@hostname.example.com",
 
 - **Password Resets:** I'm leaving password management up to you. Since this configuration uses plain UNIX accounts, you won't be able to add a password reset webpage without some kind of crappy setuid CGI script (yikes!). Look into LDAP authentication if you have a bunch of non-neckbeard users. Otherwise, `man login.conf` for information on enforcing password expiration and complexity.
 
+- **Backups**: another thing I'm leaving up to you, since your requirements will almost certainly be unique. Shouldn't be too difficult:
+    - **Maildirs**: tar them up, maybe encrypt them, and scp them offsite periodically.
+    - **User accounts**: back up `/etc/{passwd,master.passwd,group}`
+    - **Backup MX records:** I don't bother with a backup MX. They are a massive target for spammers, and legit mail servers will keep retrying delivery for multiple days if your primary MX goes down.
+    - **Prosody:** periodically tar up the HTTP upload dir and do a `pg_dump` to save user info and message archives.
+    - **Keys:** tar up your DNSSEC keys (`/var/nsd/keys`) and DKIM keys (`/etc/mail/dkim`)
+    - Assuming you copy all these items back to their origal location, the playbook won't generate new keys if they already exist.
+
 ## Resources
 
 - [How to Run Your Own Mail Server](https://www.c0ffee.net/blog/mail-server-guide/): my original email guide. Written for FreeBSD, but still lots of great info about mail hosting. [HN Discussion](https://news.ycombinator.com/item?id=16238937)
