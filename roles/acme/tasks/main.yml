@@ -44,13 +44,13 @@
 - name: add acme-client to crontab
   cron:
     name: acme-client {{ domain }}
-    job: acme-client {{ domain }} && /etc/acme/run-hooks.sh
+    job: acme-client -v {{ domain }} && /etc/acme/run-hooks.sh
     hour: 5
     minute: 22
 
 - name: add ocspcheck to crontab
   cron:
     name: ocspcheck {{ domain }}
-    job: ocspcheck -No /etc/ssl/{{ domain }}.der /etc/ssl/{{ domain }}.fullchain.pem && rcctl reload httpd
+    job: ocspcheck -Nvo /etc/ssl/{{ domain }}.der /etc/ssl/{{ domain }}.fullchain.pem && rcctl reload httpd
     hour: 5
-    minute: 23
+    minute: 26
